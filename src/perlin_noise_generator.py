@@ -91,10 +91,31 @@ def perlin_matrix_to_coords(perlin_matrix, noise_cutoff = None):
     # Convert the values list to a NumPy array
     values_array = np.array(values)
 
-
-
     return coordinate_arrays, values_array
 
+
+
+
+
+def perlin_matrix_to_array_of_arrays(pic_array):
+    pic_array = np.array(pic_array)
+
+    nrows, ncols = pic_array.shape
+    transformed_coordinates = []
+
+    # Define the scaling function
+    scale = lambda x, max_val: (x / max_val) * 100
+
+    for y in range(nrows):
+        for x in range(ncols):
+            if pic_array[y, x] == 1:
+                # Apply the scaling to each coordinate
+                transformed_x = scale(x, ncols - 1)
+                transformed_y = scale(y, nrows - 1)
+                transformed_coordinates.append([transformed_x, transformed_y])
+
+    return np.array(transformed_coordinates)
+    
 
 
 
