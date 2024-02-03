@@ -5,12 +5,12 @@ from perlin_noise import PerlinNoise
 from mpl_toolkits.mplot3d import Axes3D
 
 
-def generate_ND_perlin_noise(dimension_resolution:list, octaves:int, noise_rescaling:list=[0, 1], noise_cutoff_list:list=None):
+def ND_perlin_noise_generator(dimension_resolution:list, octaves:int, noise_rescaling:list=[0, 1], noise_cutoff_list:list=None):
     """
-    Generate N-dimensional Perlin noise.
+    Generate N-dimensional Perlin noise of any octave (noisiness) with the ability to scale the nosie values (default 0-1) and noise cutoffs (round up/down to desired value)
 
     Args:
-    - dimension_resolution (list of int): The resolution along each dimension ([40,40] will generate 2D grid of spatial resolution 40 pixels).
+    - dimension_resolution (list of int): The resolution along each dimension ([40,40] will generate 2D grid of spatial resolution 40 x 40 pixels).
     - octaves (int): The number of octaves to generate the noise (higher -> more jagged).
     - noise_rescaling (list of float, optional): Rescaling range for the generated noise between [a,b]. Default is [0, 1].
     - noise_cutoff_list (list of float, optional): Apply rounding cutoffs to the generated noise.
@@ -63,7 +63,7 @@ def generate_ND_perlin_noise(dimension_resolution:list, octaves:int, noise_resca
 
 
 
-def perlin_matrix_to_coords(perlin_matrix, noise_cutoff = None):
+def perlin_M_to_coords(perlin_matrix):
     # Initialize empty lists for coordinates and values
     coordinates = []
     values = []
@@ -97,7 +97,7 @@ def perlin_matrix_to_coords(perlin_matrix, noise_cutoff = None):
 
 
 
-def perlin_matrix_to_array_of_arrays(pic_array):
+def perlin_M_to_array_of_arrays(pic_array):
     pic_array = np.array(pic_array)
 
     nrows, ncols = pic_array.shape
@@ -121,7 +121,12 @@ def perlin_matrix_to_array_of_arrays(pic_array):
 
 
 
-def plot_perlin_coord_values(coordinate_arrays, values_array, edgecolors=None):
+
+
+
+
+
+def plot_perlin_2D_3D(coordinate_arrays, values_array, edgecolors=None):
     if len(coordinate_arrays) == 2:
         plt.scatter(coordinate_arrays[0], coordinate_arrays[1], c=values_array, cmap='Greys', edgecolors=edgecolors)
         plt.xlabel('X')
