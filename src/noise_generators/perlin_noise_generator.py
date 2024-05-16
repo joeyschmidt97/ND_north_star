@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 
 from perlin_noise import PerlinNoise
 from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.colors as mcolors
+
 
 
 
@@ -180,13 +182,44 @@ def perlin_M_to_array_of_arrays(pic_array):
 
 
 def plot_perlin_2D_3D(coordinate_arrays, values_array, edgecolors=None):
+
     if len(coordinate_arrays) == 2:
-        plt.scatter(coordinate_arrays[0], coordinate_arrays[1], c=values_array, cmap='Greys', edgecolors=edgecolors)
+        fig = plt.figure()
+
+        x, y = coordinate_arrays
+        z = values_array
+
+        # Create a 2D grid of NaN values
+        x_unique = np.unique(x)
+        y_unique = np.unique(y)
+        z_grid = np.full((len(y_unique), len(x_unique)), np.nan)
+
+        for i in range(len(x)):
+            x_idx = np.where(x_unique == x[i])[0][0]
+            y_idx = np.where(y_unique == y[i])[0][0]
+            z_grid[y_idx, x_idx] = z[i]
+
+        # Create a custom colormap
+        cmap = mcolors.ListedColormap(['gray', 'black'])
+        bounds = [0, 0.5, 1]
+        norm = mcolors.BoundaryNorm(bounds, cmap.N)
+
+        fig, ax = plt.subplots(figsize=(6, 6))  # Set a consistent figure size
+        plt.imshow(z_grid, cmap=cmap, norm=norm, origin='lower', extent=(x_unique.min(), x_unique.max(), y_unique.min(), y_unique.max()))
         plt.xlabel('X')
         plt.ylabel('Y')
-        plt.colorbar(label='Values')
-        plt.title('2D Scatter Plot')
+        plt.colorbar(label='Values', ticks=[0, 1])
+        plt.title('2D Image Plot')
+
+        # Set x and y limits from 0 to 1
+        plt.xlim(0, 1)
+        plt.ylim(0, 1)
+
+        # Ensure equal scaling for both axes
+        ax.set_aspect('equal')
+
         plt.show()
+    
     if len(coordinate_arrays) == 3:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
@@ -197,3 +230,26 @@ def plot_perlin_2D_3D(coordinate_arrays, values_array, edgecolors=None):
         plt.colorbar(ax.scatter(coordinate_arrays[0], coordinate_arrays[1], coordinate_arrays[2], c=values_array, cmap='Greys'), label='Values')
         plt.title('3D Scatter Plot')
         plt.show()
+
+
+
+# def plot_perlin_2D_3D(coordinate_arrays, values_array, edgecolors=None):
+
+
+#     if len(coordinate_arrays) == 2:
+#         plt.scatter(coordinate_arrays[0], coordinate_arrays[1], c=values_array, cmap='Greys', edgecolors=edgecolors)
+#         plt.xlabel('X')
+#         plt.ylabel('Y')
+#         plt.colorbar(label='Values')
+#         plt.title('2D Scatter Plot')
+#         plt.show()
+#     if len(coordinate_arrays) == 3:
+#         fig = plt.figure()
+#         ax = fig.add_subplot(111, projection='3d')
+#         ax.scatter(coordinate_arrays[0], coordinate_arrays[1], coordinate_arrays[2], c=values_array, cmap='Greys', edgecolors=edgecolors)
+#         ax.set_xlabel('X')
+#         ax.set_ylabel('Y')
+#         ax.set_zlabel('Z')
+#         plt.colorbar(ax.scatter(coordinate_arrays[0], coordinate_arrays[1], coordinate_arrays[2], c=values_array, cmap='Greys'), label='Values')
+#         plt.title('3D Scatter Plot')
+#         plt.show()
