@@ -5,7 +5,31 @@ from perlin_noise import PerlinNoise
 from mpl_toolkits.mplot3d import Axes3D
 
 
-def ND_perlin_noise_generator(dimension_resolution:list, octaves:int, noise_rescaling:list=[0, 1], noise_cutoff_list:list=None):
+
+def normalized_perlin_coord_values(dimension_resolution:list, octaves:int):
+    """
+    Generate N-dimensional Perlin noise normalized between (0,1) of any octave (noisiness)
+
+    Args:
+    - dimension_resolution (list of int): The resolution along each dimension ([40,40] will generate 2D grid of spatial resolution 40 x 40 pixels).
+    - octaves (int): The number of octaves to generate the noise (higher -> more jagged).
+
+    Returns:
+    - list of arrays: A list of arrays containing the normalized coordinates for each dimension.
+    - array: An array containing the normalized noise values.
+    """
+
+    perlin_noise = ND_perlin_matrix(dimension_resolution=dimension_resolution, octaves=octaves, noise_cutoff_list=[0.5,0,1])
+    coord_array, values = perlin_matrix_to_coords(perlin_noise)
+
+    normalized_coord_array = normalize_coords(coord_array)
+
+    return normalized_coord_array, values
+
+
+
+
+def ND_perlin_matrix(dimension_resolution:list, octaves:int, noise_rescaling:list=[0, 1], noise_cutoff_list:list=None):
     """
     Generate N-dimensional Perlin noise of any octave (noisiness) with the ability to scale the nosie values (default 0-1) and noise cutoffs (round up/down to desired value)
 
@@ -63,7 +87,7 @@ def ND_perlin_noise_generator(dimension_resolution:list, octaves:int, noise_resc
 
 
 
-def perlin_M_to_coords(perlin_matrix):
+def perlin_matrix_to_coords(perlin_matrix):
     # Initialize empty lists for coordinates and values
     coordinates = []
     values = []
@@ -96,6 +120,28 @@ def perlin_M_to_coords(perlin_matrix):
 
 
 
+def normalize_coords(input_coord_array):
+
+    normalized_coord_array = []
+
+    for coord in input_coord_array:
+        min_val = coord.min()
+        max_val = coord.max()
+        range_val = max_val - min_val
+        # Avoid division by zero in case all elements are the same
+        if range_val != 0:
+            normalized = (coord - min_val) / range_val
+        else:
+            normalized = np.zeros_like(coord)
+        normalized_coord_array.append(normalized)
+
+    return normalized_coord_array
+
+
+
+
+
+
 
 def perlin_M_to_array_of_arrays(pic_array):
     pic_array = np.array(pic_array)
@@ -123,6 +169,13 @@ def perlin_M_to_array_of_arrays(pic_array):
 
 
 
+
+
+
+
+############################################################################################################
+################################# PLotting functions for 2D and 3D #########################################
+############################################################################################################
 
 
 
