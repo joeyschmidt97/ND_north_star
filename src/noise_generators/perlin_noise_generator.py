@@ -6,7 +6,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.colors as mcolors
 
 
-from ND_north_star.src.data_transforms.coord_to_image_transforms import coord_val_to_image
+from ND_north_star.src.utils.coord_to_image_transforms import coord_val_to_image
 
 
 def normalized_perlin_coord_values(dimension_resolution:list, octaves:int):
