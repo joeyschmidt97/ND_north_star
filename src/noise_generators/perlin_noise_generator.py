@@ -224,7 +224,7 @@ def plot_perlin_2D_3D(dataset_dict:dict, edgecolors=None, color_scheme:str='grey
     if len(coordinate_arrays) == 3:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        ax.scatter(coordinate_arrays[0], coordinate_arrays[1], coordinate_arrays[2], c=values_array, cmap='Greys', edgecolors=edgecolors)
+        ax.scatter(coordinate_arrays[0], coordinate_arrays[1], coordinate_arrays[2], c=values_array, cmap='Greys', alpha=0.2)
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         ax.set_zlabel('Z')

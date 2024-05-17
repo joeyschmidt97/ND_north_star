@@ -42,43 +42,48 @@ def plot_SE_ND_in_out_plots(SE_dataset_dict:dict, shape:str = 'circle'):
     SE_values = SE_dataset_dict['values_array']
 
     dimension = len(coord_list)
-    half_hypercube_diag = np.sqrt(dimension)
+    half_hypercube_diag = np.sqrt(dimension)/2
 
     shape = shape.lower()
     if shape == 'circle':
-        radii = np.linspace(0.01 * half_hypercube_diag, half_hypercube_diag, 50)
+        radii = np.linspace(0.01 * half_hypercube_diag, half_hypercube_diag, 100)
         sphere_center_coord = np.full(dimension, 0.5)
 
         MSE_inside = np.zeros_like(radii)
         MSE_outside = np.zeros_like(radii)
 
         for r_ind, r in enumerate(radii):
-            SE_inside = []
-            SE_outside = []
+            SE_inside = np.zeros_like(SE_values)
+            SE_outside = np.zeros_like(SE_values)
             
             for i in range(len(SE_values)):
+
                 point = np.array([coord[i] for coord in coord_list])
                 distance = np.linalg.norm(point - sphere_center_coord)
 
+                # print(r, half_hypercube_diag, point, distance)
+
                 if distance <= r:
-                    SE_inside.append(SE_values[i])
+                    SE_inside[i] = SE_values[i]
                 else:
-                    SE_outside.append(SE_values[i])
+                    SE_outside[i] = SE_values[i]
             
+            MSE_inside[r_ind] = np.mean(SE_inside)
+            
+            MSE_outside[r_ind] = np.mean(SE_outside)
+            # if SE_inside:
+            #     MSE_inside[r_ind] = np.mean(SE_inside)
+            # else:
+            #     MSE_inside[r_ind] = np.nan  # or another value to indicate no data
 
-            if SE_inside:
-                MSE_inside[r_ind] = np.mean(SE_inside)
-            else:
-                MSE_inside[r_ind] = np.nan  # or another value to indicate no data
-
-            if SE_outside:
-                MSE_outside[r_ind] = np.mean(SE_outside)
-            else:
-                MSE_outside[r_ind] = np.nan  # or another value to indicate no data
+            # if SE_outside:
+            #     MSE_outside[r_ind] = np.mean(SE_outside)
+            # else:
+            #     MSE_outside[r_ind] = np.nan  # or another value to indicate no data
 
 
-        plt.plot(radii/half_hypercube_diag, MSE_inside, label='Inside Sphere')
-        plt.plot(radii/half_hypercube_diag, MSE_outside, label='Outside Sphere')
+        plt.plot(radii/half_hypercube_diag, MSE_inside, label=f'Inside {dimension}D-hypersphere')
+        plt.plot(radii/half_hypercube_diag, MSE_outside, label=f'Outside {dimension}D-hypersphere')
         plt.xlabel('$R/l_{diag}$')
         plt.ylabel('MSE')
         plt.legend()
@@ -120,7 +125,7 @@ def plot_SE_2D(SE_dataset_dict:dict):
         plt.xlabel('X')
         plt.ylabel('Y')
         plt.colorbar(label='Values', ticks=[0, 1])
-        plt.title('2D Image Plot')
+        plt.title('2D Squared Error Image')
 
         # Set x and y limits from 0 to 1
         plt.xlim(0, 1)
