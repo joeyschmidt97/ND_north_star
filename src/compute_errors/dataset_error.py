@@ -41,14 +41,53 @@ def plot_SE_ND_in_out_plots(SE_dataset_dict:dict, shape:str = 'circle'):
     coord_list = SE_dataset_dict['coordinates_list']
     SE_values = SE_dataset_dict['values_array']
 
-    dimensions = len(coord_list)
-
-    half_hypercube_diag = np.sqrt(dimensions)
+    dimension = len(coord_list)
+    half_hypercube_diag = np.sqrt(dimension)
 
     shape = shape.lower()
     if shape == 'circle':
-        pass
+        radii = np.linspace(0.01 * half_hypercube_diag, half_hypercube_diag, 50)
+        sphere_center_coord = np.full(dimension, 0.5)
+
+        MSE_inside = np.zeros_like(radii)
+        MSE_outside = np.zeros_like(radii)
+
+        for r_ind, r in enumerate(radii):
+            SE_inside = []
+            SE_outside = []
+            
+            for i in range(len(SE_values)):
+                point = np.array([coord[i] for coord in coord_list])
+                distance = np.linalg.norm(point - sphere_center_coord)
+
+                if distance <= r:
+                    SE_inside.append(SE_values[i])
+                else:
+                    SE_outside.append(SE_values[i])
+            
+
+            if SE_inside:
+                MSE_inside[r_ind] = np.mean(SE_inside)
+            else:
+                MSE_inside[r_ind] = np.nan  # or another value to indicate no data
+
+            if SE_outside:
+                MSE_outside[r_ind] = np.mean(SE_outside)
+            else:
+                MSE_outside[r_ind] = np.nan  # or another value to indicate no data
+
+
+        plt.plot(radii/half_hypercube_diag, MSE_inside, label='Inside Sphere')
+        plt.plot(radii/half_hypercube_diag, MSE_outside, label='Outside Sphere')
+        plt.xlabel('$R/l_{diag}$')
+        plt.ylabel('MSE')
+        plt.legend()
+        plt.show()
+
+
+
     elif shape == 'square':
+        radii = np.linspace(0, half_hypercube_diag, 100)
         pass
     else:
         raise ValueError("Invalid shape. Please choose 'circle' or 'square'")
