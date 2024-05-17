@@ -1,7 +1,41 @@
 import numpy as np
 
 
-def coord_val_to_image(coord_array:list, values_array:list):
+
+
+
+def image_to_coord_val(image_2D: np.ndarray):
+    """
+    Transforms a 2D image representation into a set of coordinate and value arrays.
+
+    Parameters:
+    - image_2D: 2D numpy array
+        A 2D array where each cell corresponds to a value, with NaNs indicating missing values.
+
+    Returns:
+    - coord_array: list
+        A list containing two lists of normalized coordinates (x and y) between 0 and 1.
+    - values_array: list
+        A list containing the corresponding values for each (x, y) coordinate pair.
+    """
+    y_coords, x_coords = np.where(~np.isnan(image_2D))
+    values = image_2D[y_coords, x_coords].astype(int)
+
+    height, width = image_2D.shape
+
+    x_array = x_coords / (width - 1)
+    y_array = y_coords / (height - 1)
+
+    coord_array = [x_array.tolist(), y_array.tolist()]
+    values_array = values.tolist()
+
+    return coord_array, values_array
+
+
+
+
+
+def dataset_2D_to_image(dataset_dict:dict):
     """
     Transforms a set of coordinate and value arrays into a 2D image representation. Will default to NaNs if no values at a given coordinate are given.
 
@@ -18,6 +52,9 @@ def coord_val_to_image(coord_array:list, values_array:list):
     Raises:
     - AssertionError: If the length of coord_array is not 2 or if the lengths of the x, y, and values arrays do not match.
     """
+    copy_dataset_dict = dataset_dict.copy()
+    coord_array = copy_dataset_dict['coordinates_array']
+    values_array = copy_dataset_dict['values_array']
     
     assert len(coord_array) == 2, "Ensure there are only two coordinates in the 'coord_array' to transform to an image"
 

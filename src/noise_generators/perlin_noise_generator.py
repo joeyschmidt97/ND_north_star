@@ -6,7 +6,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.colors as mcolors
 
 
-from ND_north_star.src.utils.coord_to_image_transforms import coord_val_to_image
+from ND_north_star.src.utils.coord_to_image_transforms import dataset_2D_to_image
 
 
 def normalized_perlin_coord_values(dimension_resolution:list, octaves:int):
@@ -27,7 +27,9 @@ def normalized_perlin_coord_values(dimension_resolution:list, octaves:int):
 
     normalized_coord_array = normalize_coords(coord_array)
 
-    return normalized_coord_array, values
+    dataset_dict = {'coordinates_array': normalized_coord_array, 'values_array': values}
+
+    return dataset_dict
 
 
 
@@ -184,9 +186,13 @@ def perlin_M_to_array_of_arrays(pic_array):
 
 
 
-def plot_perlin_2D_3D(coordinate_arrays, values_array, edgecolors=None):
+def plot_perlin_2D_3D(dataset_dict:dict, edgecolors=None):
+
+    coordinate_arrays = dataset_dict['coordinates_array']
+    values_array = dataset_dict['values_array']
 
     if len(coordinate_arrays) == 2:
+        z_grid = dataset_2D_to_image(dataset_dict)
         fig = plt.figure()
 
         x_min = coordinate_arrays[0].min()
@@ -194,9 +200,6 @@ def plot_perlin_2D_3D(coordinate_arrays, values_array, edgecolors=None):
         y_min = coordinate_arrays[1].min()
         y_max = coordinate_arrays[1].max()
 
-        z_grid = coord_val_to_image(coordinate_arrays, values_array)
-
-        print(z_grid)
 
         # Create a custom colormap
         cmap = mcolors.ListedColormap(['gray', 'black'])

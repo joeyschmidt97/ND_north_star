@@ -2,7 +2,7 @@ import numpy as np
 from scipy.spatial import cKDTree
 from scipy.stats import qmc
 
-def sample_coords_and_values(coords, values, num_samples, method='random'):
+def sample_coords_and_values(dataset_dict:dict, num_samples, method='random'):
     """
     Sample coordinates and values using different sampling methods.
 
@@ -16,6 +16,8 @@ def sample_coords_and_values(coords, values, num_samples, method='random'):
     sampled_coords (list): A list of sampled coordinates [sampled_x, sampled_y, ...].
     sampled_values (array): An array of values associated with the sampled coordinates.
     """
+    coords = dataset_dict['coordinates_array']
+    values = dataset_dict['values_array']
     
     num_dimensions = len(coords)
     assert all(len(arr) == len(values) for arr in coords), "Length of all coordinate arrays and values must be the same"
@@ -38,4 +40,6 @@ def sample_coords_and_values(coords, values, num_samples, method='random'):
     sampled_coords = [coords[i][indices] for i in range(num_dimensions)]
     sampled_values = values[indices]
 
-    return sampled_coords, sampled_values
+    sampled_dataset_dict = {'coordinates_array': sampled_coords, 'values_array': sampled_values}
+
+    return sampled_dataset_dict
