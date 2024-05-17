@@ -4,7 +4,7 @@ import numpy as np
 
 
 
-def image_to_coord_val(image_2D: np.ndarray):
+def image_to_dataset_2D(image_2D: np.ndarray):
     """
     Transforms a 2D image representation into a set of coordinate and value arrays.
 
@@ -29,7 +29,9 @@ def image_to_coord_val(image_2D: np.ndarray):
     coord_array = [x_array.tolist(), y_array.tolist()]
     values_array = values.tolist()
 
-    return coord_array, values_array
+    dataset_dict = {'coordinates_array': coord_array, 'values_array': values} 
+
+    return dataset_dict
 
 
 
@@ -53,8 +55,9 @@ def dataset_2D_to_image(dataset_dict:dict):
     - AssertionError: If the length of coord_array is not 2 or if the lengths of the x, y, and values arrays do not match.
     """
     copy_dataset_dict = dataset_dict.copy()
-    coord_array = copy_dataset_dict['coordinates_array']
+    coord_array = copy_dataset_dict['coordinates_list']
     values_array = copy_dataset_dict['values_array']
+
     
     assert len(coord_array) == 2, "Ensure there are only two coordinates in the 'coord_array' to transform to an image"
 

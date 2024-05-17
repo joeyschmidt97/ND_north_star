@@ -9,7 +9,7 @@ import matplotlib.colors as mcolors
 from ND_north_star.src.utils.coord_to_image_transforms import dataset_2D_to_image
 
 
-def normalized_perlin_coord_values(dimension_resolution:list, octaves:int):
+def normalized_perlin_data(dimension_resolution:list, octaves:int):
     """
     Generate N-dimensional Perlin noise normalized between (0,1) of any octave (noisiness)
 
@@ -27,7 +27,7 @@ def normalized_perlin_coord_values(dimension_resolution:list, octaves:int):
 
     normalized_coord_array = normalize_coords(coord_array)
 
-    dataset_dict = {'coordinates_array': normalized_coord_array, 'values_array': values}
+    dataset_dict = {'coordinates_list': normalized_coord_array, 'values_array': values}
 
     return dataset_dict
 
@@ -186,9 +186,9 @@ def perlin_M_to_array_of_arrays(pic_array):
 
 
 
-def plot_perlin_2D_3D(dataset_dict:dict, edgecolors=None):
+def plot_perlin_2D_3D(dataset_dict:dict, edgecolors=None, color_scheme:str='grey'):
 
-    coordinate_arrays = dataset_dict['coordinates_array']
+    coordinate_arrays = dataset_dict['coordinates_list']
     values_array = dataset_dict['values_array']
 
     if len(coordinate_arrays) == 2:
@@ -200,9 +200,8 @@ def plot_perlin_2D_3D(dataset_dict:dict, edgecolors=None):
         y_min = coordinate_arrays[1].min()
         y_max = coordinate_arrays[1].max()
 
-
         # Create a custom colormap
-        cmap = mcolors.ListedColormap(['gray', 'black'])
+        cmap = mcolors.ListedColormap(['grey', 'black'])
         bounds = [0, 0.5, 1]
         norm = mcolors.BoundaryNorm(bounds, cmap.N)
 

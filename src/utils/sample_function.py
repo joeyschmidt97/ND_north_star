@@ -16,7 +16,7 @@ def sample_coords_and_values(dataset_dict:dict, num_samples, method='random'):
     sampled_coords (list): A list of sampled coordinates [sampled_x, sampled_y, ...].
     sampled_values (array): An array of values associated with the sampled coordinates.
     """
-    coords = dataset_dict['coordinates_array']
+    coords = dataset_dict['coordinates_list']
     values = dataset_dict['values_array']
     
     num_dimensions = len(coords)
@@ -40,6 +40,6 @@ def sample_coords_and_values(dataset_dict:dict, num_samples, method='random'):
     sampled_coords = [coords[i][indices] for i in range(num_dimensions)]
     sampled_values = values[indices]
 
-    sampled_dataset_dict = {'coordinates_array': sampled_coords, 'values_array': sampled_values}
+    sampled_dataset_dict = {'coordinates_list': sampled_coords, 'values_array': sampled_values}
 
     return sampled_dataset_dict
