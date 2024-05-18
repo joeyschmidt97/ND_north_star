@@ -74,7 +74,7 @@ def zero_filler(incomplete_dataset_dict:dict, resolution_list:list = 'auto'):
     real_values = incomplete_dataset_dict['values_array']
 
     computed_values = full_values.copy()
-    computed_values += 1
+    # computed_values += 1
 
     for real_ind, _ in enumerate(real_coord_list[0]):
         real_point = [real_coord[real_ind] for real_coord in real_coord_list]

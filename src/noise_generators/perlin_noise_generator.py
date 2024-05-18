@@ -1,35 +1,46 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import MinMaxScaler
 
 from perlin_noise import PerlinNoise
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.colors as mcolors
 
 
-from ND_north_star.src.utils.coord_to_image_transforms import dataset_2D_to_image
 
-
-def normalized_perlin_data(dimension_resolution:list, octaves:int):
-    """
-    Generate N-dimensional Perlin noise normalized between (0,1) of any octave (noisiness)
-
-    Args:
-    - dimension_resolution (list of int): The resolution along each dimension ([40,40] will generate 2D grid of spatial resolution 40 x 40 pixels).
-    - octaves (int): The number of octaves to generate the noise (higher -> more jagged).
-
-    Returns:
-    - list of arrays: A list of arrays containing the normalized coordinates for each dimension.
-    - array: An array containing the normalized noise values.
-    """
-
-    perlin_noise = ND_perlin_matrix(dimension_resolution=dimension_resolution, octaves=octaves, noise_cutoff_list=[0.5,0,1])
-    coord_array, values = perlin_matrix_to_coords(perlin_noise)
-
-    normalized_coord_array = normalize_coords(coord_array)
-
-    dataset_dict = {'coordinates_list': normalized_coord_array, 'values_array': values}
-
-    return dataset_dict
+def normalized_perlin_data(dimension_resolution: list, octaves: int):
+    # Assuming ND_perlin_matrix is a function that generates the perlin noise matrix
+    perlin_matrix = ND_perlin_matrix(dimension_resolution=dimension_resolution, octaves=octaves, noise_cutoff_list=[0.5, 0, 1])
+    
+    # Convert list to numpy array if needed
+    array = np.array(perlin_matrix)
+    shape = array.shape
+ 
+    # Generate all possible coordinates in the N-dimensional array
+    coordinates = np.indices(shape).reshape(len(shape), -1).T
+    data = []      
+    # Iterate over the coordinates and get the corresponding values
+    for coord in coordinates:
+        value = array[tuple(coord)]
+        data.append(list(coord) + [value])
+    
+    # Separate the features and the value column
+    features = [d[:-1] for d in data]
+    values = [d[-1] for d in data]
+    
+    # Normalize the feature columns
+    scaler = MinMaxScaler()
+    normalized_features = scaler.fit_transform(features)
+    
+    # Create the output dictionary
+    perlin_dict = {
+        'features': normalized_features.tolist(),
+        'values': values,
+        'resolution': dimension_resolution,
+        'coordinates': [f'x{i}' for i in range(len(shape))],
+        'octaves': octaves,
+        'dimension': len(dimension_resolution),
+    }
+    
+    return perlin_dict
 
 
 
@@ -98,159 +109,52 @@ def ND_perlin_matrix(dimension_resolution:list, octaves:int, noise_rescaling:lis
 
 
 
-def perlin_matrix_to_coords(perlin_matrix):
-    # Initialize empty lists for coordinates and values
-    coordinates = []
-    values = []
-
-    # Helper function to recursively flatten the nested data
-    def recursive_flatten(current_data, current_coords):
-        for i, item in enumerate(current_data):
-            if isinstance(item, list):
-                # If the item is a list, recursively flatten it
-                recursive_flatten(item, current_coords + [i])
-            else:
-                # If the item is a value, store its coordinates and value
-                coordinates.append(current_coords + [i])
-                values.append(item)
-
-    # Start the recursive flattening process
-    recursive_flatten(perlin_matrix, [])
-
-    # Determine the number of dimensions
-    num_dimensions = max(map(len, coordinates))
-
-    # Create separate arrays for each dimension
-    coordinate_arrays = [np.array([coord[dim] if dim < len(coord) else 0 for coord in coordinates]) for dim in range(num_dimensions)]
-
-    # Convert the values list to a NumPy array
-    values_array = np.array(values)
-
-    return coordinate_arrays, values_array
-
-
-
-
-def normalize_coords(input_coord_array):
-
-    normalized_coord_array = []
-
-    for coord in input_coord_array:
-        min_val = coord.min()
-        max_val = coord.max()
-        range_val = max_val - min_val
-        # Avoid division by zero in case all elements are the same
-        if range_val != 0:
-            normalized = (coord - min_val) / range_val
-        else:
-            normalized = np.zeros_like(coord)
-        normalized_coord_array.append(normalized)
-
-    return normalized_coord_array
-
-
-
-
-
-
-
-def perlin_M_to_array_of_arrays(pic_array):
-    pic_array = np.array(pic_array)
-
-    nrows, ncols = pic_array.shape
-    transformed_coordinates = []
-
-    # Define the scaling function
-    scale = lambda x, max_val: (x / max_val) * 100
-
-    for y in range(nrows):
-        for x in range(ncols):
-            if pic_array[y, x] == 1:
-                # Apply the scaling to each coordinate
-                transformed_x = scale(x, ncols - 1)
-                transformed_y = scale(y, nrows - 1)
-                transformed_coordinates.append([transformed_x, transformed_y])
-
-    return np.array(transformed_coordinates)
-    
-
-
-
-
-
-
-
 ############################################################################################################
 ################################# Plotting functions for 2D and 3D #########################################
 ############################################################################################################
 
 
 
-def plot_perlin_2D_3D(dataset_dict:dict, edgecolors=None, color_scheme:str='grey'):
+def plot_perlin_2D_3D(dataset_dict:dict, edgecolors=None):
 
-    coordinate_arrays = dataset_dict['coordinates_list']
-    values_array = dataset_dict['values_array']
+    features = np.array(dataset_dict['features'])
+    values = dataset_dict['values']
+    coordinates = dataset_dict['coordinates']
+    resolution_list = dataset_dict['resolution']
+    D = dataset_dict['dimension']
 
-    if len(coordinate_arrays) == 2:
-        z_grid = dataset_2D_to_image(dataset_dict)
-        fig = plt.figure()
+    if D == 2:
+        plt.figure(figsize=(8, 8))
+        resolution = min(resolution_list)
 
-        x_min = coordinate_arrays[0].min()
-        x_max = coordinate_arrays[0].max()
-        y_min = coordinate_arrays[1].min()
-        y_max = coordinate_arrays[1].max()
+        if resolution < 100:
+            marker_scale = resolution
+        else:
+            marker_scale = 4*resolution
 
-        # Create a custom colormap
-        cmap = mcolors.ListedColormap(['grey', 'black'])
-        bounds = [0, 0.5, 1]
-        norm = mcolors.BoundaryNorm(bounds, cmap.N)
+        # Scatter plot
+        scatter = plt.scatter(features[:, 0], features[:, 1], c=values, cmap='gray', s=1200/marker_scale, edgecolors=edgecolors)
 
-        fig, ax = plt.subplots(figsize=(6, 6))  # Set a consistent figure size
-        plt.imshow(z_grid, cmap=cmap, norm=norm, origin='lower', extent=(x_min, x_max, y_min, y_max))
-        plt.xlabel('X')
-        plt.ylabel('Y')
-        plt.colorbar(label='Values', ticks=[0, 1])
-        plt.title('2D Image Plot')
+        # Adding a color bar to show the mapping from values to colors
+        plt.colorbar(scatter, label='Value Intensity')
 
-        # Set x and y limits from 0 to 1
-        plt.xlim(0, 1)
-        plt.ylim(0, 1)
+        # Labels and title
+        plt.xlabel('X Coordinate')
+        plt.ylabel('Y Coordinate')
+        plt.title('2D Scatter Plot with Grayscale Values')
 
-        # Ensure equal scaling for both axes
-        ax.set_aspect('equal')
-
+        # Show plot
         plt.show()
+
     
-    if len(coordinate_arrays) == 3:
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-        ax.scatter(coordinate_arrays[0], coordinate_arrays[1], coordinate_arrays[2], c=values_array, cmap='Greys', alpha=0.2)
-        ax.set_xlabel('X')
-        ax.set_ylabel('Y')
-        ax.set_zlabel('Z')
-        plt.colorbar(ax.scatter(coordinate_arrays[0], coordinate_arrays[1], coordinate_arrays[2], c=values_array, cmap='Greys'), label='Values')
-        plt.title('3D Scatter Plot')
-        plt.show()
+    # if D == 3:
+    #     fig = plt.figure()
+    #     ax = fig.add_subplot(111, projection='3d')
+    #     ax.scatter(coordinate_arrays[0], coordinate_arrays[1], coordinate_arrays[2], c=values_array, cmap='Greys', alpha=0.2)
+    #     ax.set_xlabel('X')
+    #     ax.set_ylabel('Y')
+    #     ax.set_zlabel('Z')
+    #     plt.colorbar(ax.scatter(coordinate_arrays[0], coordinate_arrays[1], coordinate_arrays[2], c=values_array, cmap='Greys'), label='Values')
+    #     plt.title('3D Scatter Plot')
+    #     plt.show()
 
-
-
-# def plot_perlin_2D_3D(coordinate_arrays, values_array, edgecolors=None):
-
-
-#     if len(coordinate_arrays) == 2:
-#         plt.scatter(coordinate_arrays[0], coordinate_arrays[1], c=values_array, cmap='Greys', edgecolors=edgecolors)
-#         plt.xlabel('X')
-#         plt.ylabel('Y')
-#         plt.colorbar(label='Values')
-#         plt.title('2D Scatter Plot')
-#         plt.show()
-#     if len(coordinate_arrays) == 3:
-#         fig = plt.figure()
-#         ax = fig.add_subplot(111, projection='3d')
-#         ax.scatter(coordinate_arrays[0], coordinate_arrays[1], coordinate_arrays[2], c=values_array, cmap='Greys', edgecolors=edgecolors)
-#         ax.set_xlabel('X')
-#         ax.set_ylabel('Y')
-#         ax.set_zlabel('Z')
-#         plt.colorbar(ax.scatter(coordinate_arrays[0], coordinate_arrays[1], coordinate_arrays[2], c=values_array, cmap='Greys'), label='Values')
-#         plt.title('3D Scatter Plot')
-#         plt.show()
