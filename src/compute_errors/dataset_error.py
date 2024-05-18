@@ -20,7 +20,7 @@ def compute_ND_error(original_ND_data:dict, predicted_ND_data:dict):
     for orig_coord, pred_coords in zip(original_coord_list, predicted_coord_list):
         assert len(orig_coord) == len(pred_coords), "Compared datasets must have the same number of coordinates"
 
-        coord_compare = np.array(orig_coord) == np.array(pred_coords)
+        coord_compare = np.isclose(orig_coord, pred_coords)
         assert coord_compare.all(), "Compared datasets must have the same coordinates to compare"
 
     original_values = original_ND_data['values_array']

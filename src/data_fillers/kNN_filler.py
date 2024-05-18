@@ -1,54 +1,55 @@
-
 import numpy as np
-import copy
+from sklearn.neighbors import KNeighborsRegressor
+
+from ND_north_star.src.data_fillers.find_empty_points import find_empty_data_points
 
 
-def kNN_data_filler(dataset_dict:dict, k:int = 3, resolution_list:list = None):
-    """
+def kNN_data_filler(incomplete_dataset_dict:dict, k:int = 3, resolution_list:list = 'auto'):
 
-    """
-    # Check if the images have the same shape
-    real_coord_list = dataset_dict['coordinates_list']
-    real_values = dataset_dict['values_array']
+    real_coord_list = incomplete_dataset_dict['coordinates_list']
+    real_values = incomplete_dataset_dict['values_array']
 
+    real_coord_array = np.array(real_coord_list).T # Convert from [x1,x2,x3,...] to [[x1_1,x2_1,x3_1,...], [x1_2,x2_2,x3_2,...], ...]
 
 
-    # Generate filled coordinate lists for each resolution
-    ind_coord_arrays = [np.linspace(0, 1, res) for res in resolution_list]
+    knn = KNeighborsRegressor(n_neighbors=k)
+    knn.fit(real_coord_array, real_values)
 
-    # Create a meshgrid for the coordinates in all dimensions
-    meshgrid = np.meshgrid(*ind_coord_arrays, indexing='ij')
 
-    # Flatten the meshgrid arrays and store each as a separate array in a list
-    full_coord_list = [grid.flatten() for grid in meshgrid]
+    computed_dataset_dict = find_empty_data_points(incomplete_dataset_dict, resolution_list)
+    full_coord_list = computed_dataset_dict['coordinates_list']
+    full_values = computed_dataset_dict['values_array']
 
-    # computed_coord_list = full_coord_list.copy()
-    remove_indices = []
+    # Create a mask for NaN values in full_values
+    nan_mask = np.isnan(full_values)
+    non_nan_mask = ~nan_mask # Invert the mask to get a mask for non-NaN values
 
-    # Iterate through the points in real_coord_list and full_coord_list
-    for real_ind, _ in enumerate(real_coord_list[0]):
-        real_point = [real_coord[real_ind] for real_coord in real_coord_list]
-        real_point = tuple(real_point)
+    # Filter the coordinates based on the NaN mask
+    compute_coords = np.array(full_coord_list).T[non_nan_mask]
+    compute_values = knn.predict(compute_coords)
 
-        for full_ind, _ in enumerate(full_coord_list[0]):
-            full_point = [full_coord[full_ind] for full_coord in full_coord_list]
-            full_point = tuple(full_point)
 
-            
 
-            if real_point == full_point:
-                # print(real_point, full_point, real_point == full_point)
+    combined_coords = np.array(full_coord_list).T
+    combined_values = np.zeros_like(full_values)
 
-                remove_indices.append(full_ind)
+    for i, coord in enumerate(combined_coords):
+        coord_tuple = tuple(coord)
 
-                # for computed_dim, _ in enumerate(computed_coord_list):
-                #     remove_indices
-                #     computed_coord_list[computed_dim][full_ind].pop()
+        if coord_tuple in map(tuple, real_coord_array):
+            index = list(map(tuple, real_coord_array)).index(coord_tuple)
+            combined_values[i] = real_values[index]
+        elif coord_tuple in map(tuple, compute_coords):
+            index = list(map(tuple, compute_coords)).index(coord_tuple)
+            combined_values[i] = compute_values[index]
+
+    # Create the combined dataset dictionary
+    combined_dataset_dict = {
+        'coordinates_list': full_coord_list,
+        'values_array': combined_values
+    }
+
+
+
+    return combined_dataset_dict
     
-    computed_coord_list = full_coord_list.copy()
-    for computed_dim, _ in enumerate(computed_coord_list):
-        computed_coord_list[computed_dim] = np.delete(computed_coord_list[computed_dim], remove_indices)
-
-    return computed_coord_list
-
-
