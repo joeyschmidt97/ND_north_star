@@ -46,6 +46,7 @@ def plot_SE_ND_in_out_plots(SE_dataset_dict:dict, shape:str = 'circle'):
 
     shape = shape.lower()
     if shape == 'circle':
+        # radii = np.linspace(0.01, 0.5, 100)
         radii = np.linspace(0.01 * half_hypercube_diag, half_hypercube_diag, 100)
         sphere_center_coord = np.full(dimension, 0.5)
 
@@ -69,27 +70,33 @@ def plot_SE_ND_in_out_plots(SE_dataset_dict:dict, shape:str = 'circle'):
                     SE_outside[i] = SE_values[i]
             
             MSE_inside[r_ind] = np.mean(SE_inside)
-            
             MSE_outside[r_ind] = np.mean(SE_outside)
-            # if SE_inside:
-            #     MSE_inside[r_ind] = np.mean(SE_inside)
-            # else:
-            #     MSE_inside[r_ind] = np.nan  # or another value to indicate no data
 
-            # if SE_outside:
-            #     MSE_outside[r_ind] = np.mean(SE_outside)
-            # else:
-            #     MSE_outside[r_ind] = np.nan  # or another value to indicate no data
+        norm_radii = radii / half_hypercube_diag
+        max_circle_radii = 0.5 / half_hypercube_diag
+        # norm_radii = radii / 0.5
 
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(6, 6))
 
-        plt.plot(radii/half_hypercube_diag, MSE_inside, label=f'Inside {dimension}D-hypersphere')
-        plt.plot(radii/half_hypercube_diag, MSE_outside, label=f'Outside {dimension}D-hypersphere')
-        plt.xlabel('$R/l_{diag}$')
-        plt.ylabel('MSE')
-        plt.legend()
+        ax1.plot(norm_radii, MSE_inside, label=f'Inside {dimension}D-hypersphere')
+        # ax1.plot(norm_radii, MSE_outside, label=f'Outside {dimension}D-hypersphere')
+        ax1.axvline(x=max_circle_radii, color='r', linestyle='--', label=f'Max {dimension}D-hypersphere Radius')
+        ax1.set_xlabel('$R/l_{diag}$')
+        ax1.set_ylabel('MSE')
+        ax1.legend()
+
+        dMSE_inside = np.gradient(MSE_inside, norm_radii)
+        dMSE_outside = np.gradient(MSE_outside, norm_radii)
+
+        ax2.plot(norm_radii, dMSE_inside, label=f'Inside {dimension}D-hypersphere')
+        # ax2.plot(norm_radii, dMSE_outside, label=f'Outside {dimension}D-hypersphere')
+        ax2.axvline(x=max_circle_radii, color='r', linestyle='--', label=f'Max {dimension}D-hypersphere Radius')
+        ax2.set_xlabel('$R/l_{diag}$')
+        ax2.set_ylabel('d(MSE)/d($R/l_{diag}$)')
+        ax2.legend()
+
+        plt.tight_layout()
         plt.show()
-
-
 
     elif shape == 'square':
         radii = np.linspace(0, half_hypercube_diag, 100)
