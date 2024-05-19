@@ -141,7 +141,7 @@ def plot_perlin_2D_3D(dataset_dict:dict, edgecolors=None, cmap='gray'):
         # Labels and title
         plt.xlabel('X Coordinate')
         plt.ylabel('Y Coordinate')
-        plt.title('2D Scatter Plot with Grayscale Values')
+        # plt.title('2D Scatter Plot with Grayscale Values')
 
         # Show plot
         plt.show()
