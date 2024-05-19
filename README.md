@@ -11,8 +11,7 @@ This project uses 2D-Perlin noise (typically for terrain map generation in video
 
 To create more complex data, we can increase the octaves of the Perlin noise in order to optimize performance across more complex data.
 
-<img src="https://github.com/joeyschmidt97/ND_north_star/blob/main/images/perlin_noise_octave_1.png" width="256">
-<img src="https://github.com/joeyschmidt97/ND_north_star/blob/main/images/perlin_noise_octave_8.png" width="256">
+<img src="https://github.com/joeyschmidt97/ND_north_star/blob/main/images/perlin_noise_octave_1.png" width="256"><img src="https://github.com/joeyschmidt97/ND_north_star/blob/main/images/perlin_noise_octave_8.png" width="256">
 
 
 # Stakeholders
