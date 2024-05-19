@@ -83,8 +83,49 @@ def plot_SE_ND_in_out_plots(SE_dataset_dict:dict, shape:str = 'circle'):
         plt.tight_layout()
         plt.show()
 
+
     elif shape == 'square':
-        radii = np.linspace(0, half_hypercube_diag, 100)
-        pass
+        edge_lengths = np.linspace(0.001, 0.5, 100)
+        hypercube_center_coord = np.full(dimension, 0.5)
+
+        MSE_inside = np.zeros_like(edge_lengths)
+        MSE_outside = np.zeros_like(edge_lengths)
+
+        for e_ind, edge_length in enumerate(edge_lengths):
+            lower_bound = hypercube_center_coord - edge_length
+            upper_bound = hypercube_center_coord + edge_length
+
+            # Check if each point is within the bounds for all dimensions
+            inside_mask = np.all((point_list >= lower_bound) & (point_list <= upper_bound), axis=1)
+            outside_mask = ~inside_mask
+
+            SE_inside = SE_values[inside_mask]
+            SE_outside = SE_values[outside_mask]
+
+            MSE_inside[e_ind] = np.mean(SE_inside) if SE_inside.size > 0 else 0
+            MSE_outside[e_ind] = np.mean(SE_outside) if SE_outside.size > 0 else 0
+
+        norm_edge_lengths = edge_lengths / 0.5
+
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(6, 6))
+
+        ax1.plot(norm_edge_lengths, MSE_inside, label=f'Inside {dimension}D-hypercube')
+        ax1.axvline(x=1.0, color='r', linestyle='--', label=f'Max {dimension}D-hypercube Edge Length')
+        ax1.set_xlabel('$Edge Length/0.5$')
+        ax1.set_ylabel('MSE')
+        ax1.legend()
+
+        dMSE_inside = np.gradient(MSE_inside, norm_edge_lengths)
+        dMSE_outside = np.gradient(MSE_outside, norm_edge_lengths)
+
+        ax2.plot(norm_edge_lengths, dMSE_inside, label=f'Inside {dimension}D-hypercube')
+        ax2.axvline(x=1.0, color='r', linestyle='--', label=f'Max {dimension}D-hypercube Edge Length')
+        ax2.set_xlabel('$Edge Length/0.5$')
+        ax2.set_ylabel('d(MSE)/d($Edge Length/0.5$)')
+        ax2.legend()
+
+        plt.tight_layout()
+        plt.show()
+
     else:
         raise ValueError("Invalid shape. Please choose 'circle' or 'square'")
