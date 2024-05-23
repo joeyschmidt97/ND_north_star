@@ -115,13 +115,15 @@ def ND_perlin_matrix(dimension_resolution:list, octaves:int, noise_rescaling:lis
 
 
 
-def plot_perlin_2D_3D(dataset_dict:dict, edgecolors=None, cmap='gray'):
+def plot_perlin_2D_3D(dataset_dict:dict, edgecolors=None, cmap='gray_r'):
 
     features = np.array(dataset_dict['features'])
     values = dataset_dict['values']
     coordinates = dataset_dict['coordinates']
     resolution_list = dataset_dict['resolution']
     D = dataset_dict['dimension']
+
+    print(features[0:5])
 
     if D == 2:
         plt.figure(figsize=(8, 8))
@@ -132,8 +134,11 @@ def plot_perlin_2D_3D(dataset_dict:dict, edgecolors=None, cmap='gray'):
         else:
             marker_scale = 4*resolution
 
+        print(features[:,0][0:5])
+        print(features[:,1][0:5])
+        print(values[0:5])
         # Scatter plot
-        scatter = plt.scatter(features[:, 0], features[:, 1], c=values, cmap=cmap, s=1200/marker_scale, edgecolors=edgecolors)
+        scatter = plt.scatter(features[:, 0],features[:, 1], c=values, cmap=cmap, s=1200/marker_scale, edgecolors=edgecolors)
 
         # Adding a color bar to show the mapping from values to colors
         plt.colorbar(scatter, label='Value Intensity')
