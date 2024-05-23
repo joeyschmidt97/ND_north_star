@@ -123,7 +123,6 @@ def plot_perlin_2D_3D(dataset_dict:dict, edgecolors=None, cmap='gray_r'):
     resolution_list = dataset_dict['resolution']
     D = dataset_dict['dimension']
 
-    print(features[0:5])
 
     if D == 2:
         plt.figure(figsize=(8, 8))
@@ -152,14 +151,28 @@ def plot_perlin_2D_3D(dataset_dict:dict, edgecolors=None, cmap='gray_r'):
         plt.show()
 
     
-    # if D == 3:
-    #     fig = plt.figure()
-    #     ax = fig.add_subplot(111, projection='3d')
-    #     ax.scatter(coordinate_arrays[0], coordinate_arrays[1], coordinate_arrays[2], c=values_array, cmap='Greys', alpha=0.2)
-    #     ax.set_xlabel('X')
-    #     ax.set_ylabel('Y')
-    #     ax.set_zlabel('Z')
-    #     plt.colorbar(ax.scatter(coordinate_arrays[0], coordinate_arrays[1], coordinate_arrays[2], c=values_array, cmap='Greys'), label='Values')
-    #     plt.title('3D Scatter Plot')
-    #     plt.show()
+    elif D == 3:
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        resolution = min(resolution_list)
 
+        if resolution < 100:
+            marker_scale = resolution
+        else:
+            marker_scale = 4*resolution
+        
+        if edgecolors is None:
+            edgecolors = np.where(values == 0, 'k', 'none')
+        
+        facecolors = np.where(values == 0, 'none', plt.cm.get_cmap(cmap)(values / np.max(values)))
+
+        scatter = ax.scatter(features[:, 0], features[:, 1], features[:, 2], c=facecolors, edgecolors=edgecolors, s=500/marker_scale)
+        
+        cbar = fig.colorbar(plt.cm.ScalarMappable(cmap=cmap), ax=ax, label='Value Intensity')
+        cbar.set_ticks(np.linspace(0, 1, num=11))
+        cbar.set_ticklabels(np.round(np.linspace(np.min(values), np.max(values), num=11), 2))
+        
+        ax.set_xlabel('X Coordinate')
+        ax.set_ylabel('Y Coordinate')
+        ax.set_zlabel('Z Coordinate')
+        plt.show()
