@@ -133,9 +133,6 @@ def plot_perlin_2D_3D(dataset_dict:dict, edgecolors=None, cmap='gray_r'):
         else:
             marker_scale = 4*resolution
 
-        print(features[:,0][0:5])
-        print(features[:,1][0:5])
-        print(values[0:5])
         # Scatter plot
         scatter = plt.scatter(features[:, 0],features[:, 1], c=values, cmap=cmap, s=1200/marker_scale, edgecolors=edgecolors)
 
