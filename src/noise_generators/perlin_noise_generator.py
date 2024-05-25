@@ -136,6 +136,11 @@ def plot_perlin_2D_3D(dataset_dict:dict, edgecolors=None, cmap='gray_r'):
         # Scatter plot
         scatter = plt.scatter(features[:, 0],features[:, 1], c=values, cmap=cmap, s=1200/marker_scale, edgecolors=edgecolors)
 
+        boundary_splines = dataset_dict.get('boundary_splines', None)
+        if boundary_splines is not None:
+            for _, boundary_spline in boundary_splines.items():
+                plt.plot(boundary_spline[:, 0], boundary_spline[:, 1], color='r', linewidth=2)
+
         # Adding a color bar to show the mapping from values to colors
         plt.colorbar(scatter, label='Value Intensity')
 
@@ -143,6 +148,8 @@ def plot_perlin_2D_3D(dataset_dict:dict, edgecolors=None, cmap='gray_r'):
         plt.xlabel('X Coordinate')
         plt.ylabel('Y Coordinate')
         # plt.title('2D Scatter Plot with Grayscale Values')
+
+
 
         # Show plot
         plt.show()

@@ -8,6 +8,25 @@ from scipy.interpolate import splprep, splev
 
 
 
+
+
+def generate_boundary_splines(dataset:dict, smoothing_factor=0.001, num_points=100):
+    boundary_points = find_boundary_points(dataset)
+    distinct_boundaries = group_distinct_boundary_curves(boundary_points)
+
+    boundary_splines = {}
+    for boundary_ind, boundary_points in distinct_boundaries.items():
+        x_new, y_new = generate_spline_curve(boundary_points, smoothing_factor, num_points)
+        boundary_splines[boundary_ind] = np.array([x_new, y_new]).T
+
+    return boundary_splines
+
+
+
+
+
+
+
 def find_boundary_points(dataset:dict):
     points = dataset['features']
     values = dataset['values']
