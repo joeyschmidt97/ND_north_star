@@ -14,8 +14,13 @@ def generate_boundary_splines(dataset:dict, smoothing_factor=0.001, num_points=1
     boundary_points = find_boundary_points(dataset)
     distinct_boundaries = group_distinct_boundary_curves(boundary_points)
 
+    dataset['distinct_boundary_points'] = distinct_boundaries
+
     boundary_splines = {}
     for boundary_ind, boundary_points in distinct_boundaries.items():
+        if len(boundary_points) < 4:
+            print(f"Skipping boundary {boundary_ind}: Not enough points to fit a spline.")
+            continue
         x_new, y_new = generate_spline_curve(boundary_points, smoothing_factor, num_points)
         boundary_splines[boundary_ind] = np.array([x_new, y_new]).T
 
@@ -86,11 +91,23 @@ def group_distinct_boundary_curves(boundary_points):
 
 
 
-def generate_spline_curve(points, smoothing_factor=0.001, num_points=100):
+def generate_spline_curve(points, smoothing_factor=0.001, num_points=100, noise_level=1e-6):
 
     # Split data into x and y coordinates
     x = points[:, 0]
     y = points[:, 1]
+
+    # Check for unique points and add noise if necessary
+    if len(np.unique(x)) < len(x):
+        # print("Duplicate x values found. Adding noise to make them unique.")
+        x += np.random.uniform(-noise_level, noise_level, size=x.shape)
+    if len(np.unique(y)) < len(y):
+        # print("Duplicate y values found. Adding noise to make them unique.")
+        y += np.random.uniform(-noise_level, noise_level, size=y.shape)
+
+    if np.any(np.isnan(x)) or np.any(np.isnan(y)) or np.any(np.isinf(x)) or np.any(np.isinf(y)):
+        print("Invalid input: NaN or Inf values found. Skipping.")
+    
 
     # Parameterize the points with a parameter t
     t = np.linspace(0, 1, len(points))
