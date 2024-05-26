@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-from skimage.metrics import hausdorff_distance
+import skimage.metrics
 
 def compute_ND_error(original_ND_data:dict, predicted_ND_data:dict):
     """
