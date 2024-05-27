@@ -38,6 +38,7 @@ def find_boundary_points(dataset:dict):
 
     grid_x, grid_y = np.mgrid[0:1:100j, 0:1:100j]
 
+
     # Interpolate data onto grid
     grid_z = griddata(points, values, (grid_x, grid_y), method='linear')
 
