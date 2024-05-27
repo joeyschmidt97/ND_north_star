@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from skimage.metrics import hausdorff_distance
-from ND_north_star.src.edge_detection.contour_points_2D import find_boundary_points
 
 def compute_ND_error(original_ND_data:dict, predicted_ND_data:dict):
     """
@@ -149,42 +148,3 @@ def plot_SE_ND_in_out_plots(SE_dataset_dict:dict, shape:str = 'circle'):
 
     else:
         raise ValueError("Invalid shape. Please choose 'circle' or 'square'")
-    
-
-
-import numpy as np
-from scipy.spatial import distance
-
-def chamfer_distance(set1, set2):
-    dist_matrix = distance.cdist(set1, set2, 'euclidean')
-    dist1 = np.mean(np.min(dist_matrix, axis=1))
-    dist2 = np.mean(np.min(dist_matrix, axis=0))
-    return dist1 + dist2
-
-
-def compute_ND_Chamfer_error(original_ND_data:dict, predicted_ND_data:dict):
-    """
-    Compute the Chamfer error between two dataset
-    """
-    # Check if the images have the same shape
-    original_coord_list = np.array(original_ND_data['features'])
-    predicted_coord_list = np.array(predicted_ND_data['features'])
-
-    assert len(original_coord_list) == len(predicted_coord_list), "Compared datasets must the same number of points"
-
-    coord_compare = np.isclose(original_coord_list, predicted_coord_list)
-    assert coord_compare.all(), "Compared datasets must have the same coordinates to compare"
-
-    #original_values = np.array(original_ND_data['values'])
-    #predicted_values = np.array(predicted_ND_data['values'])
-
-    boundary_original = find_boundary_points(original_ND_data)
-    boundary_pred = find_boundary_points(predicted_ND_data)
-
-    CD_data = chamfer_distance(boundary_original, boundary_pred)
-
-
-    CD_dataset_dict = original_ND_data.copy()
-    CD_dataset_dict['values'] = CD_data
-
-    return CD_dataset_dict
