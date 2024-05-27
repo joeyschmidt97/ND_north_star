@@ -1,9 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-
-
-
+from skimage.metrics import hausdorff_distance
 
 def compute_ND_error(original_ND_data:dict, predicted_ND_data:dict):
     """
@@ -20,7 +18,7 @@ def compute_ND_error(original_ND_data:dict, predicted_ND_data:dict):
 
     original_values = np.array(original_ND_data['values'])
     predicted_values = np.array(predicted_ND_data['values'])
-    
+ 
     SE_data = (original_values - predicted_values)**2
 
     SE_dataset_dict = original_ND_data.copy()
@@ -28,7 +26,28 @@ def compute_ND_error(original_ND_data:dict, predicted_ND_data:dict):
 
     return SE_dataset_dict
 
+def compute_ND_Hausdorff_error(original_ND_data:dict, predicted_ND_data:dict):
+    """
+    Compute the Hausdorff error between two dataset
+    """
+    # Check if the images have the same shape
+    original_coord_list = np.array(original_ND_data['features'])
+    predicted_coord_list = np.array(predicted_ND_data['features'])
 
+    assert len(original_coord_list) == len(predicted_coord_list), "Compared datasets must the same number of points"
+
+    coord_compare = np.isclose(original_coord_list, predicted_coord_list)
+    assert coord_compare.all(), "Compared datasets must have the same coordinates to compare"
+
+    original_values = np.array(original_ND_data['values'])
+    predicted_values = np.array(predicted_ND_data['values'])
+    HD_data = hausdorff_distance(original_values, predicted_values)
+
+
+    HD_dataset_dict = original_ND_data.copy()
+    HD_dataset_dict['values'] = HD_data
+
+    return HD_dataset_dict
 
 
 
