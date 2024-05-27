@@ -10,21 +10,41 @@ from scipy.interpolate import splprep, splev
 
 
 
-def generate_boundary_splines(dataset:dict, smoothing_factor=0.001, num_points=100):
+def generate_boundary_splines(dataset:dict, smoothing_factor=0.001, shared_boundary_points=500):
     boundary_points = find_boundary_points(dataset)
     distinct_boundaries = group_distinct_boundary_curves(boundary_points)
 
     dataset['distinct_boundary_points'] = distinct_boundaries
 
+    tot_boundary_points = 0
+    for _, boundary_points in distinct_boundaries.items():
+        tot_boundary_points += len(boundary_points)
+    # print(f"Total number of boundary points: {tot_boundary_points}")
+
+    last_boundary_ind = list(distinct_boundaries.keys())[-1]
+    running_boundary_point_count = 0
+    
     boundary_splines = {}
+
     for boundary_ind, boundary_points in distinct_boundaries.items():
         if len(boundary_points) < 4:
             print(f"Skipping boundary {boundary_ind}: Not enough points to fit a spline.")
             continue
-        x_new, y_new = generate_spline_curve(boundary_points, smoothing_factor, num_points)
-        boundary_splines[boundary_ind] = np.array([x_new, y_new]).T
 
-    return boundary_splines
+        if boundary_ind == last_boundary_ind:
+            num_points = shared_boundary_points - running_boundary_point_count
+        else:
+            boundary_point_frac = len(boundary_points) / tot_boundary_points
+            num_points = int(shared_boundary_points * boundary_point_frac)
+        x_new, y_new = generate_spline_curve(boundary_points, smoothing_factor, num_points)
+    
+        boundary_splines[boundary_ind] = np.array([x_new, y_new]).T
+        running_boundary_point_count += len(x_new.tolist())
+    
+    # print(f"Total number of boundary points after spline fitting: {running_boundary_point_count}")
+    dataset['boundary_splines'] = boundary_splines
+
+    return dataset
 
 
 
