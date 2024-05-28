@@ -20,18 +20,36 @@ def create_perlin_dataset(num_images: int, dimensions: list, octave: int, random
     while passed_images < num_images:
         # print(f'Attempt {attempts}')
         save_dict = perlin_to_dict(dimensions=dimensions, octave=octave, num_samples=random_num_samples, boundary_points=boundary_points)
+        
+
         if save_dict is None:
             # print(f'Skipped attempt {attempts} due to failure')
             continue
         else:
             ds = save_dict_to_xarray(save_dict)
+
             datasets.append(ds)
             passed_images += 1
             # print(f'Successfully added image {passed_images}')
-        # attempts += 1
+       
 
+    # Add octaves as a data variable to each dataset
+    for ds in datasets:
+        octave_value = ds.attrs.get('octaves', None)
+        if octave_value is not None:
+            ds = ds.assign(octaves=octave_value)
+
+    # Concatenate the datasets along the 'image' dimension
     combined_ds = xr.concat(datasets, dim=pd.Index(range(passed_images), name='image'))
-    
+
+    # # Now you can access the octaves from the combined dataset
+    # print(combined_ds['octaves'].values, 'combined dataset octaves')
+
+    # combined_ds = xr.concat(datasets, dim=pd.Index(range(passed_images), name='image'))
+
+
+
+
     return combined_ds
 
 
