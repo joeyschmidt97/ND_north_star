@@ -119,7 +119,6 @@ def plot_perlin_2D_3D(dataset_dict:dict, edgecolors=None, cmap='gray_r'):
 
     features = np.array(dataset_dict['features'])
     values = dataset_dict['values']
-    coordinates = dataset_dict['coordinates']
     resolution_list = dataset_dict['resolution']
     D = dataset_dict['dimension']
 
