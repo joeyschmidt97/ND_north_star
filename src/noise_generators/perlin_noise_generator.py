@@ -115,7 +115,7 @@ def ND_perlin_matrix(dimension_resolution:list, octaves:int, noise_rescaling:lis
 
 
 
-def plot_perlin_2D_3D(dataset_dict:dict, edgecolors=None, cmap='gray_r'):
+def plot_perlin_2D_3D(dataset_dict:dict, edgecolors='black', cmap='gray_r'):
 
     features = np.array(dataset_dict['features'])
     values = dataset_dict['values']
