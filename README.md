@@ -43,9 +43,25 @@ Our data consist of sparse 2D Perlin noise of resolution (30,30) ranging across 
 ## KNN-CNN model:
 - We use k-nearest neighbor (kNN), with the 3 nearest neighbors, to fill the missing data points and use the same CNN model as above to reconstruct the boundary given minimal information
 
+<img src="https://github.com/joeyschmidt97/ND_north_star/blob/main/images/model_edge_detection_images.png" width="512">
+
+
 # Performance
 <img src="https://github.com/joeyschmidt97/ND_north_star/blob/main/images/model_performance.png" width="780">
 
 - WCE diverges while the MSE converges: Although we lose some features in the whole picture, we still guarantee pointwise accuracy at a certain level
 - Zero-filling outperforms at the top of MSE: In extreme case, zero-filling guarantee 50% accuracy when kNN is out of the threshold of good performance
+
+
+# Future Directions
+## Higher Dimensional Generalization:
+- Assessing whether our model can generalize to higher dimensions and identifying suitable alternative models if it cannot. This will help us understand the scalability of our approach.
+
+## Pathfinding:
+- Path Volume: Determine the "volume" of a path by employing hyperspheres to measure the available space between boundaries.
+- Path Windiness: Assess the windiness of the path by analyzing vector angles in multiple dimensions as the path progresses.
+
+## Different Measurements:
+- Hausdorff Distance (extreme geometric error between two sets of points)
+- Chamfer Distance (average geometric error between two sets of points)
 
