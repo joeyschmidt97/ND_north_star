@@ -44,7 +44,7 @@ Our data consist of sparse 2D Perlin noise of resolution (30,30) ranging across 
 - We use k-nearest neighbor (kNN), with the 3 nearest neighbors, to fill the missing data points and use the same CNN model as above to reconstruct the boundary given minimal information
 
 # Performance
-<img src="https://github.com/joeyschmidt97/ND_north_star/blob/main/images/model_performance.png" width="512">
+<img src="https://github.com/joeyschmidt97/ND_north_star/blob/main/images/model_performance.png" width="780">
 
 - WCE diverges while the MSE converges: Although we lose some features in the whole picture, we still guarantee pointwise accuracy at a certain level
 - Zero-filling outperforms at the top of MSE: In extreme case, zero-filling guarantee 50% accuracy when kNN is out of the threshold of good performance
