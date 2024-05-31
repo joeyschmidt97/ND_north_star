@@ -34,16 +34,17 @@ Our data consist of sparse 2D Perlin noise of resolution (30,30) ranging across 
 - The WCE (weighted-cross entropy) of the boundary compared between the actual image and the model-reconstructed boundary. This gives a weighted error tuned to the thickness and continuity of the boundary which the MSE cannot capture.
 
 # Models
-## Zero-Filling-CNN model:
+### Zero-Filling-CNN model:
 - We fill any missing data with 0s to complete the image in order to feed it into our convolutional neural network (CNN) model
 - Two convolution layers, one MaxPooling layer, then two deconvolution layers. 
 - We use the Sigmoid function as our activation function in the last layer to get values between 0 and 1. 
 - A deconvolutional layer is the output layer ensuring an image with the boundaries is given as the output
 
-## KNN-CNN model:
+### KNN-CNN model:
 - We use k-nearest neighbor (kNN), with the 3 nearest neighbors, to fill the missing data points and use the same CNN model as above to reconstruct the boundary given minimal information
 
-<img src="https://github.com/joeyschmidt97/ND_north_star/blob/main/images/model_edge_detection_images.png" width="512">
+### Example edge reconstruction
+<img src="https://github.com/joeyschmidt97/ND_north_star/blob/main/images/model_edge_detection_images.png" width="800">
 
 
 # Performance
@@ -54,14 +55,14 @@ Our data consist of sparse 2D Perlin noise of resolution (30,30) ranging across 
 
 
 # Future Directions
-## Higher Dimensional Generalization:
+### Higher Dimensional Generalization:
 - Assessing whether our model can generalize to higher dimensions and identifying suitable alternative models if it cannot. This will help us understand the scalability of our approach.
 
-## Pathfinding:
+### Pathfinding:
 - Path Volume: Determine the "volume" of a path by employing hyperspheres to measure the available space between boundaries.
 - Path Windiness: Assess the windiness of the path by analyzing vector angles in multiple dimensions as the path progresses.
 
-## Different Measurements:
+### Different Measurements:
 - Hausdorff Distance (extreme geometric error between two sets of points)
 - Chamfer Distance (average geometric error between two sets of points)
 
