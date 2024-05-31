@@ -23,11 +23,29 @@ __However__, because each of these points can be thought of as an experiments, t
 
 
 # Dataset
-Our data consist of sparse 2D Perlin noise of resolution (80,80) ranging across octaves 1-4. The number of points in each image is ranges from [50, 100, 200, 5000]
+Our data consist of sparse 2D Perlin noise of resolution (30,30) ranging across octaves 1-4. The number of points dropped in each image ranges from 0-95% to test for model robustness.
 
 # Stakeholders
 - Machine learning optimization engineers
 - Scientists/Engineers using expensive equipment for data collection
 
 # KPI (Key Performance Indicators)
-- The MSE (mean-squared error) of the sparse image boundary compared to the actual image boundary
+- The MSE (mean-squared error) of the sparse image boundary compared to the actual image boundary to give an overall measure of performance across all points (black and white).
+- The WCE (weighted-cross entropy) of the boundary compared between the actual image and the model-reconstructed boundary. This gives a weighted error tuned to the thickness and continuity of the boundary which the MSE cannot capture.
+
+# Models
+## Zero-Filling-CNN model:
+- We fill any missing data with 0s to complete the image in order to feed it into our convolutional neural network (CNN) model
+- Two convolution layers, one MaxPooling layer, then two deconvolution layers. 
+- We use the Sigmoid function as our activation function in the last layer to get values between 0 and 1. 
+- A deconvolutional layer is the output layer ensuring an image with the boundaries is given as the output
+
+## KNN-CNN model:
+- We use k-nearest neighbor (kNN), with the 3 nearest neighbors, to fill the missing data points and use the same CNN model as above to reconstruct the boundary given minimal information
+
+# Performance
+<img src="https://github.com/joeyschmidt97/ND_north_star/blob/main/images/model_performance.png" width="512">
+
+- WCE diverges while the MSE converges: Although we lose some features in the whole picture, we still guarantee pointwise accuracy at a certain level
+- Zero-filling outperforms at the top of MSE: In extreme case, zero-filling guarantee 50% accuracy when kNN is out of the threshold of good performance
+
