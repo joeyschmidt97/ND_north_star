@@ -54,6 +54,18 @@ Our data consist of sparse 2D Perlin noise of resolution (30,30) ranging across 
 - Zero-filling outperforms at the top of MSE: In extreme case, zero-filling guarantee 50% accuracy when kNN is out of the threshold of good performance
 
 
+# Example Use Case
+
+An interesting example where this algorithm can be used is in undersea cable laying by using bathymetric data, or underwater elevation data. Because determining underwater topology can be cost-intensive with different sensors and time-intensive with many sweeps required to fill the map, our algorithm can help by using the sparse data of underwater mountain elevation and giving a best guess (given that Perlin noise mimics mountain ranges quite closely).
+
+One of the criteria for laying cable to improve its longevity is that the slopes it rests on are gently sloping. This ensures the cable does not bend severely causing it to tear and break. Looking at bathymetric data over the coast of Florida we see many spots that are incomplete (which our algorithm can work with) but let's focus on a zoomed in portion on the seabed. 
+<img src="https://github.com/joeyschmidt97/ND_north_star/blob/main/images/seabed_image.png" width="780">
+
+Once we have this image, we take the slope and determine a slope cutoff value (dependent on the material properties of the cable) to ensure longevity of our cable. Let's assume we only collect 10% of the elevation data so we feed what we have into our algorithm and determine the boundaries for gentle sloping regions (green) vs steep sloping regions (red). Comparing to the complete data, we see a fair performance of detecting the boundary. This can then aid in finding the best path to lay our cable across the ocean floor saving time scanning more points and money both in scanning costs and extending cable life.
+
+<img src="https://github.com/joeyschmidt97/ND_north_star/blob/main/images/gentle_slope_example.png" width="780">
+
+
 # Future Directions
 ### Higher Dimensional Generalization:
 - Assessing whether our model can generalize to higher dimensions and identifying suitable alternative models if it cannot. This will help us understand the scalability of our approach.
