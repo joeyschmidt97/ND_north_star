@@ -62,6 +62,8 @@ One of the criteria for laying cable to improve its longevity is that the slopes
 
 <img src="https://github.com/joeyschmidt97/ND_north_star/blob/main/images/seabed_image.PNG" width="480">
 
+Area of Interest: -80.03679, 25.27059, -79.41606, 25.78610
+
 Once we have this image, we take the slope and determine a slope cutoff value (dependent on the material properties of the cable) to ensure longevity of our cable. Let's assume we only collect 10% of the elevation data so we feed what we have into our algorithm and determine the boundaries for gentle sloping regions (green) vs steep sloping regions (red). Comparing to the complete data, we see a fair performance of detecting the boundary. This can then aid in finding the best path to lay our cable across the ocean floor saving time scanning more points and money both in scanning costs and extending cable life.
 
 <img src="https://github.com/joeyschmidt97/ND_north_star/blob/main/images/gentle_slope_example.PNG" width="780">
